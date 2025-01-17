@@ -37,18 +37,34 @@
         var dimensionGroup = win.add("group");
         var appendDimensionsCheckbox = dimensionGroup.add("checkbox", undefined, "Append Dimensions (width x height)");
 
-        // Add Apply button
-        var applyButton = win.add("button", undefined, "Apply Rename");
+        // Add input fields for width and height
+        var sizeGroup = win.add("panel", undefined, "Resize Dimensions (Leave blank to skip)");
+        sizeGroup.alignChildren = ["fill", "top"];
+        
+        var widthGroup = sizeGroup.add("group");
+        widthGroup.add("statictext", undefined, "Width:");
+        var widthField = widthGroup.add("edittext", undefined, "");
+        widthField.characters = 10;
 
-        // Apply rename functionality
+        var heightGroup = sizeGroup.add("group");
+        heightGroup.add("statictext", undefined, "Height:");
+        var heightField = heightGroup.add("edittext", undefined, "");
+        heightField.characters = 10;
+
+        // Add Apply button
+        var applyButton = win.add("button", undefined, "Apply Rename and Resize");
+
+        // Apply rename and resize functionality
         applyButton.onClick = function() {
-            app.beginUndoGroup("Batch Rename Selected Comps");
+            app.beginUndoGroup("Batch Rename and Resize Selected Comps");
 
             var findText = findField.text;
             var replaceText = replaceField.text;
             var prefix = prefixField.text;
             var suffix = suffixField.text;
             var appendDimensions = appendDimensionsCheckbox.value;  // Check if checkbox is selected
+            var newWidth = parseInt(widthField.text, 10);
+            var newHeight = parseInt(heightField.text, 10);
 
             // Loop through selected items only
             var selectedItems = app.project.selection;
@@ -74,11 +90,17 @@
 
                     // Rename the item
                     item.name = newName;
+
+                    // Resize composition if dimensions are provided
+                    if (!isNaN(newWidth) && !isNaN(newHeight)) {
+                        item.width = newWidth;
+                        item.height = newHeight;
+                    }
                 }
             }
 
             app.endUndoGroup();
-            alert("Batch renaming of selected comps complete!");
+            alert("Batch renaming and resizing of selected comps complete!");
         };
 
         win.center();
